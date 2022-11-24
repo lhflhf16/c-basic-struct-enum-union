@@ -1,0 +1,28 @@
+#include<stdio.h>
+
+int check_sys()
+{
+	union un
+	{
+		char c;
+		int i;
+	}u;
+	u.i = 1;
+	//返回1则小端存储
+	//返回0则大端存储
+	return u.c;
+}
+
+int main()
+{
+	int ret = check_sys();
+	if (ret)
+	{
+		printf("小端\n");
+	}
+	else
+	{
+		printf("大端\n");
+	}
+	return 0;
+}
