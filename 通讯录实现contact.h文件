@@ -1,0 +1,69 @@
+
+#include<string.h>
+#include<stdio.h>
+#include<stdlib.h>
+
+//为了方便之后数据的改动
+#define MAX 1000
+#define MAX_NAME 30
+#define MAX_SEX 5
+#define MAX_TELE 12
+#define MAX_ADDRS 30
+#define MAX_MEMO 20
+
+//描述好友信息
+struct PeoInfo
+{
+	char name[MAX_NAME];
+	int age;
+	char sex[MAX_SEX];
+	char tele[MAX_TELE];
+	char addrs[MAX_ADDRS];
+	char memo[MAX_MEMO];
+};
+
+//描述通讯录
+//1.1000个好友信息 结构体数组
+//2.当前好友数量，方便确定添加好友时在数组中的位置
+struct contact
+{
+	struct PeoInfo data[MAX];
+	int size;
+};
+
+//使用枚举使得代码可读性增加（switch-case部分）
+enum Option
+{
+	EXIT,
+	ADD,
+	DEL,
+	SEARCH,
+	MODIFY,
+	SHOW,
+	SORT
+};
+
+//菜单函数提供选择声明
+void menu();
+
+//初始化函数声明
+void InitContact(struct contact* ps);
+
+//增加好友信息函数声明
+void AddContact(struct contact* ps);
+
+//删除指定好友的信息函数声明
+void DelContact(struct contact* ps);
+
+//查找指定好友函数声明
+void SearchContact(const struct contact* ps);
+
+//修改指定好友信息函数声明
+void ModifyContact(struct contact* ps);
+
+//展示好友信息函数声明
+void ShowContact(const struct contact* ps);
+
+//排序好友信息函数声明
+void SortContact(struct contact* ps);
+
