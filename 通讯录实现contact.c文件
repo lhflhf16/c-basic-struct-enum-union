@@ -1,0 +1,290 @@
+#define _CRT_SECURE_NO_WARNINGS 1
+
+#include"contact.h"
+
+//菜单函数
+void menu()
+{
+	printf("*******************************************\n");
+	printf("****  1.add                    2.del     **\n");
+	printf("****  3.search                 4.modify  **\n");
+	printf("****  5.show                   6.sort    **\n");
+	printf("****  0.exit                             **\n");
+	printf("*******************************************\n");
+}
+
+//初始化函数
+void InitContact(struct contact* ps)
+{
+	//这里拿到数组的地址对数组进行初始化
+	memset(ps->data, 0, sizeof(ps->data));
+	ps->size = 0;
+}
+
+//因为会经常使用查找这个功能，所以单独定义查找函数
+static int FindByName(const struct contact* ps, char name[MAX_NAME])
+{
+	int i = 0;
+	for (i = 0; i < ps->size; i++)
+	{
+		if (strcmp(ps->data[i].name, name) == 0)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+//增加好友信息函数
+void AddContact(struct contact* ps)
+{
+	//如果通讯录满了就不能增加了
+	if (ps->size==MAX)
+	{
+		printf("通讯录已满\n");
+	}
+	else
+	{
+		//不用\n换行，scanf输入结束后回车换行
+		printf("请输入好友名字:>");
+		scanf("%s", ps->data[ps->size].name);
+		printf("请输入好友年龄:>");
+		scanf("%d", &(ps->data[ps->size].age));
+		printf("请输入好友性别:>");
+		scanf("%s", ps->data[ps->size].sex);
+		printf("请输入好友电话:>");
+		scanf("%s", ps->data[ps->size].tele);
+		printf("请输入好友住址:>");
+		scanf("%s", ps->data[ps->size].addrs);
+		printf("请输入好友备注:>");
+		scanf("%s", ps->data[ps->size].memo);
+		
+		ps->size++;//增加好友信息size也要变化
+		printf("添加成功\n");
+	}
+}
+
+//删除指定好友的信息函数
+void DelContact(struct contact* ps)
+{
+	if (ps->size == 0)
+	{
+		printf("通讯录为空\n");
+	}
+	else
+	{
+		char name[MAX_NAME];
+		printf("请输入想要删除的好友名字:>");
+		scanf("%s", name);
+		int pos = FindByName(ps, name);//在通讯录中查找目标好友，找到返回该处下标，否则返回-1
+		if (pos == -1)
+		{
+			printf("找不到好友\n");
+		}
+		else
+		{
+			//将后面的好友向前移动
+			int j = 0;
+			for (j = pos; j < ps->size - 1; j++)
+			{
+				struct PeoInfo tmp = ps->data[j + 1];
+				ps->data[j + 1] = ps->data[j];
+				ps->data[j] = tmp;
+			}
+			//通讯录好友数减少
+			printf("删除成功\n");
+			//size--后，就不会打印第size个元素，所以不清零也行
+			ps->size--;
+		}
+	}
+}
+
+//查找指定好友函数
+void SearchContact(const struct contact* ps)
+{
+	if (ps->size == 0)
+	{
+		printf("通讯录为空\n");
+	}
+	else
+	{
+		char name[MAX_NAME];
+		printf("请输入要查找的好友名字:>");
+		scanf("%s", name);
+		int pos = FindByName(ps, name);//在通讯录中查找目标好友，找到返回该处下标，否则返回-1
+		if (pos == -1)
+		{
+			printf("好友不存在\n");
+		}
+		else
+		{
+			printf("查找成功\n");
+			printf("%-20s\t%-4s\t%-5s\t%-15s\t%-30s\t%-10s\n", "姓名", "年龄", "性别", "电话", "住址","备注");
+			printf("%-20s\t%-4d\t%-5s\t%-15s\t%-30s\t%-10s\n", ps->data[pos].name,
+				ps->data[pos].age,
+				ps->data[pos].sex,
+				ps->data[pos].tele,
+				ps->data[pos].addrs,
+				ps->data[pos].memo);
+		}
+	}
+}
+
+//找到要修改的内容，并修改
+static void Modify(struct contact* ps, char select[MAX_ADDRS], int pos)
+{
+	if (strcmp("姓名", select) == 0)
+	{
+		printf("请输入姓名:>");
+		scanf("%s", ps->data[pos].name);
+	}
+	else if (strcmp("年龄", select) == 0)
+	{
+		printf("请输入年龄:>");
+		scanf("%d", &(ps->data[pos].age));
+	}
+	else if (strcmp("性别", select) == 0)
+	{
+		printf("请输入性别:>");
+		scanf("%s", ps->data[pos].sex);
+	}
+	else if (strcmp("电话", select) == 0)
+	{
+		printf("请输入电话:>");
+		scanf("%s", ps->data[pos].tele);
+	}
+	else if (strcmp("住址", select) == 0)
+	{
+		printf("请输入住址:>");
+		scanf("%s", ps->data[pos].addrs);
+	}
+	else if (strcmp("备注", select))
+	{
+		printf("请输入备注:>");
+		scanf("%s", ps->data[pos].memo);
+	}
+	else
+	{
+		printf("输入错误\n");
+	}
+}
+
+//修改指定好友信息函数
+void ModifyContact(struct contact* ps)
+{
+	if (ps->size == 0)
+	{
+		printf("通讯录为空\n");
+	}
+	else
+	{
+		char name[MAX_NAME];
+		printf("请输入想要修改信息的好友名字:>");
+		scanf("%s", name);
+		int pos = FindByName(ps, name);//在通讯录中查找目标好友，找到返回该处下标，否则返回-1
+		if (pos == -1)
+		{
+			printf("找不到好友\n");
+		}
+		else
+		{
+			////老师方法
+			//printf("请输入好友名字:>");
+			//scanf("%s", ps->data[pos].name);
+			//printf("请输入好友年龄:>");
+			//scanf("%d", &(ps->data[pos].age));
+			//printf("请输入好友性别:>");
+			//scanf("%s", ps->data[pos].sex);
+			//printf("请输入好友电话:>");
+			//scanf("%s", ps->data[pos].tele);
+			//printf("请输入好友住址:>");
+			//scanf("%s", ps->data[pos].addrs);
+			//printf("请输入好友备注:>");
+			//scanf("%s", ps->data[ps->size].memo);
+
+			////我的方法
+			int input = 0;
+			do
+			{
+				//先打印一次好友信息
+				printf("%-20s\t%-4s\t%-5s\t%-15s\t%-30s\t%-10s\n", "姓名", "年龄", "性别", "电话", "住址", "备注");
+				printf("%-20s\t%-4d\t%-5s\t%-15s\t%-30s\t%-10s\n", ps->data[pos].name,
+					ps->data[pos].age,
+					ps->data[pos].sex,
+					ps->data[pos].tele,
+					ps->data[pos].addrs,
+					ps->data[pos].memo);
+
+				char select[MAX_ADDRS];
+				printf("请输入想要修改的内容：姓名、年龄……:>");
+				scanf("%s", select);
+				//在该处结构体中找到内容并修改
+				Modify(ps, select, pos);
+				printf("修改成功\n");
+				printf("是否继续修改1/0:>");
+				scanf("%d", &input);
+			} while (input);
+		}
+	}
+}
+
+
+//展示好友信息函数
+void ShowContact(const struct contact* ps)
+{
+	if (ps->size == 0)
+	{
+		printf("通讯录为空\n");
+	}
+	else
+	{
+		int i = 0;
+		printf("%-20s\t%-4s\t%-5s\t%-15s\t%-30s\t%-10s\n", "姓名", "年龄", "性别", "电话", "住址", "备注");
+		for (i = 0; i < ps->size; i++)
+		{
+			printf("%-20s\t%-4d\t%-5s\t%-15s\t%-30s\t%-10s\n", ps->data[i].name,
+				ps->data[i].age,
+				ps->data[i].sex,
+				ps->data[i].tele,
+				ps->data[i].addrs,
+				ps->data[i].memo);
+		}
+	}
+}
+
+//名字的比较方法
+int cmp_name(const void* e1, const void* e2)
+{
+	return strcmp(((struct PeoInfo*)e1)->name, ((struct PeoInfo*)e2)->name);
+}
+
+//年龄的比较方法
+int cmp_age(const void* e1, const void* e2)
+{
+	return ((struct PeoInfo*)e1)->age - ((struct PeoInfo*)e2)->age;
+}
+
+//排序好友信息函数
+void SortContact(struct contact* ps)
+{
+	char sort[MAX_ADDRS];
+	printf("请输入想对什么排序:>");
+	scanf("%s", sort);
+	if (!strcmp("姓名", sort))
+	{
+		//参数：排序的数组、要排序的元素、数组元素的大小、比较方法
+		qsort(ps->data, ps->size, sizeof(ps->data[0]), cmp_name);
+		printf("排序成功\n");
+	}
+	else if (!strcmp("年龄",sort))
+	{
+		qsort(ps->data, ps->size, sizeof(ps->data[0]), cmp_age);
+		printf("排序成功\n");
+	}
+	else
+	{
+		printf("有待开发\n");
+	}
+}
+
+
